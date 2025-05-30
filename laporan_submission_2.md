@@ -72,8 +72,53 @@ Dataset ini diambil dari [Kaggle](https://www.kaggle.com/datasets/chanoncharuchi
 ### Deskripsi Fitur
 
 1. Dataset Korean Drama (korean_drama.csv)
-2. Dataset Reviews (reviews.csv)
+   
+| Fitur         | Tipe Data | Deskripsi                                                |
+| ------------- | --------- | -------------------------------------------------------- |
+| kdrama_id     | Object    | ID unik tiap drama                                       |
+| drama_name    | Object    | Judul drama                                              |
+| year          | Integer   | Tahun rilis                                              |
+| director      | Object    | Nama sutradara                                           |
+| screenwriter  | Object    | Penulis naskah                                           |
+| country       | Object    | Negara asal drama (biasanya Korea Selatan)              |
+| type          | Object    | Tipe tayangan (TV, Web, dll.)                            |
+| tot_eps       | Integer   | Jumlah episode                                           |
+| duration      | Float     | Durasi rata-rata per episode (menit)                     |
+| start_dt      | Object    | Tanggal mulai tayang                                     |
+| end_dt        | Object    | Tanggal selesai tayang                                   |
+| aired_on      | Object    | Hari tayang                                              |
+| org_net       | Object    | Jaringan TV/Platform penayang                            |
+| content_rt    | Object    | Rating konten (misalnya: 15+, 19+)                       |
+| synopsis      | Object    | Ringkasan cerita                                         |
+| rank          | Integer   | Peringkat popularitas                                    |
+| pop           | Integer   | Indeks popularitas (semacam skor gabungan MyDramaList)  |
+
+
+2. Dataset Reviews (`reviews.csv`)
+   
+| Fitur               | Tipe Data | Deskripsi                                            |
+| -------------------|-----------|------------------------------------------------------|
+| user_id            | Object    | ID pengguna                                          |
+| title              | Object    | Judul drama yang diulas                              |
+| story_score        | Float     | Skor cerita                                          |
+| acting_cast_score  | Float     | Skor akting dan pemain                               |
+| music_score        | Float     | Skor musik                                           |
+| rewatch_value_score| Float     | Skor niat menonton ulang                             |
+| overall_score      | Float     | Skor keseluruhan                                     |
+| review_text        | Object    | Isi ulasan pengguna                                  |
+| ep_watched         | Object    | Jumlah episode yang ditonton                         |
+| n_helpful          | Integer   | Jumlah pengguna yang merasa ulasan tersebut membantu |
+
+   
 3. Dataset Actors (wiki_actors.csv)
+
+| Fitur            | Tipe Data | Deskripsi                                 |
+| ---------------- | --------- | ----------------------------------------- |
+| actor_id       | Object   | ID unik aktor                             |
+| actor_name     | Object    | Nama aktor                                |
+| drama_name     | Object    | Judul drama yang dibintangi               |
+| character_name | Object    | Nama karakter yang diperankan             |
+| role           | Object    | Peran dalam drama (utama, pendukung, dll) |
 
 ### Exploratory Data Analysis (EDA)
 
