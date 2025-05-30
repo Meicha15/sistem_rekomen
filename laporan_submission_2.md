@@ -119,49 +119,102 @@ Dataset ini diambil dari [Kaggle](https://www.kaggle.com/datasets/chanoncharuchi
    | character_name | Object    | Nama karakter yang diperankan             |
    | role           | Object    | Peran dalam drama (utama, pendukung, dll) |
 
-### Exploratory Data Analysis (EDA)
-
 1. Informasi Struktur Data
-   * ```anime.info()``` dan ```rating.info()``` digunakan untuk mengecek jumlah entri (baris), tipe data setiap kolom, dan apakah ada nilai yang hilang (null).
-   * Terdapat 12.294 anime dan 7.813.737 penilaian dari pengguna terhadap anime.
-   * Data anime memiliki kolom bertipe objek dan numerik, sedangkan rating terdiri dari user_id, anime_id, dan rating bertipe integer.
+   - Fungsi drama.info() dan review.info() digunakan untuk memeriksa jumlah entri dan tipe data.
+   - Dataset drama berisi informasi metadata drama Korea, sedangkan review berisi skor yang diberikan pengguna.
+   - Dataset actors juga diperiksa strukturnya dengan actors.info().
+   ```python
+   drama.info()
+   review.info()
+   actors.info()
+   ```
    
 2. Nilai Unik dan Missing Value
-   * ```anime.nunique()``` digunakan untuk mengetahui jumlah nilai unik di setiap kolom.
-   * Ditemukan missing value pada kolom genre, type, episodes, dan rating pada data anime.
-   * Data rating tidak memiliki nilai yang hilang secara eksplisit (NaN), tetapi memiliki nilai -1 yang menandakan pengguna menonton anime namun tidak memberikan rating (ini umumnya dihapus dalam tahap preprocessing).
+   - Fungsi isnull().sum() digunakan pada ketiga dataset (drama, review, actors) untuk mengidentifikasi missing value.
+   - Teridentifikasi kolom-kolom dengan missing seperti duration, rank, dan org_net pada dataset drama.
+   - Nilai duplikat juga dicek dengan duplicated().sum().
+   ```python
+   drama.isnull().sum()
+   review.isnull().sum()
+   actors.isnull().sum()
    
-3. Eksplorasi Genre dan Type Anime
-   * Genre dalam dataset ditulis dalam bentuk string yang dipisahkan koma.
-   * Jumlah genre berbeda-beda dan kombinasi genre sangat beragam. Ini akan berguna untuk pendekatan Content-Based Filtering.
-   * Jenis type anime meliputi TV, Movie, OVA, Special, ONA, dan beberapa lainnya.
+   drama.duplicated().sum()
+   review.duplicated().sum()
+   actors.duplicated().sum()
+   ```
 
-4. Statistika Deskriptif
-   Menggunakan ```anime.describe(include='all')``` dan ```rating.describe(include='all')``` untuk mengetahui:
-   * Rata-rata, standar deviasi, nilai minimum dan maksimum dari anime dan rating.
-   * Jumlah anime yang ditambahkan oleh pengguna (members) sangat bervariasi, menunjukkan ketimpangan popularitas anime.
+3. Statistika Deskriptif
+   - Statistik deskriptif dilakukan dengan describe(include='all') untuk semua dataset.
+   - Diketahui bahwa jumlah episode, durasi, dan rating memiliki distribusi yang sangat bervariasi, mencerminkan keragaman konten drama Korea.
+   ```python
+   drama.describe(include='all')
+   review.describe(include='all')
+   actors.describe(include='all')
+   ```
 
-5. Visualisasi Distribusi Rating oleh Pengguna
-   * Visualisasi barplot dari rating['rating'].value_counts() menunjukkan bahwa pengguna cenderung memberi rating tinggi (8–10).
-   * Ini mencerminkan adanya positivity bias di kalangan pengguna (umum dalam sistem rating online).
-   * Terdapat rating -1 yang seharusnya rating bernilai > 1.
-     ![rating user](https://github.com/user-attachments/assets/f4ee9c22-c325-47de-8c1b-c19508afd3fd)
+4. Jumlah Drama per Tahun
+   - value_counts().sort_index() digunakan untuk menghitung jumlah drama per tahun dan divisualisasikan dalam bar chart.
+   - Menunjukkan tren peningkatan produksi drama dari tahun ke tahun.
+   ```python
+   drama['year'].value_counts().sort_index().plot(kind='bar', figsize=(12,5))
+   plt.title('Jumlah Drama per Tahun')
+   plt.xlabel('Tahun')
+   plt.ylabel('Jumlah Drama')
+   plt.show()
+   ```
 
-6. Visualisasi Distribusi Rating per Anime
-   * Distribusi rating rata-rata per anime divisualisasikan menggunakan histogram dan KDE plot (```sns.histplot```).
-   * Sebagian besar anime memiliki rating rata-rata antara 6 dan 8, yang berarti tidak banyak anime yang dianggap sangat buruk atau sangat bagus oleh komunitas secara umum.
-     ![anime rat](https://github.com/user-attachments/assets/79a7323e-15aa-43c0-8834-c5ecc2c3fee8)
+5. Distribusi Rating oleh Pengguna
+   - review['rating'] = review['overall_score'] digunakan untuk konsistensi nama kolom.
+   - Distribusi skor pengguna divisualisasikan dengan bar chart, menunjukkan mayoritas pengguna memberikan rating tinggi.
+   ```python
+   review['rating'] = review['overall_score']
+   review['rating'].value_counts().sort_index().plot(kind='bar', figsize=(10,4))
+   plt.title('Distribusi Rating oleh Pengguna')
+   plt.xlabel('Skor')
+   plt.ylabel('Jumlah')
+   plt.show()
+   ```
 
-7. Genre Terbanyak
-   * Menggunakan ```Counter``` dan ```pd.Series```, genre diekstrak dan dihitung kemunculannya.
-   * Genre paling diminati adalah Comedy, Action, Adventure, Fantasy, dan lain-lain.
-   * Genre ini nantinya menjadi fitur penting dalam sistem rekomendasi berbasis konten.
-     ![genre](https://github.com/user-attachments/assets/3f10c6e0-9f82-46ee-a181-6141c8a0c9de)
+6. Distribusi Rata-Rata Skor per Drama
+   - Rata-rata skor dihitung dengan groupby('title')['overall_score'].mean() dan divisualisasikan.
+   - Sebagian besar drama memiliki skor rata-rata antara 7 dan 9.
+   ```python
+   drama.describe(include='all')
+   review.describe(include='all')
+   actors.describe(include='all')
+   ```
 
-8. Distribusi Tipe Anime
-   * Visualisasi distribusi jenis type menunjukkan bahwa TV Series mendominasi dataset, disusul oleh Movie, OVA, dan lainnya.
-   * Ini memberi wawasan penting: sistem rekomendasi dapat menyesuaikan preferensi pengguna terhadap tipe anime.
-     ![type](https://github.com/user-attachments/assets/08600727-fa24-4a4b-8018-05244793e08d)
+7. Distribusi Tipe Drama dan Jaringan
+   - Distribusi jenis drama (type) dan negara produksi (country) dihitung dengan value_counts().
+   - Jaringan penyiaran teratas divisualisasikan, dengan jaringan seperti tvN, JTBC, dan KBS mendominasi produksi.
+   ```python
+   review.groupby('title')['overall_score'].mean().plot(kind='hist', bins=20, figsize=(10,5))
+   plt.title('Distribusi Rata-Rata Skor per Drama')
+   plt.xlabel('Rata-Rata Skor')
+   plt.ylabel('Jumlah Drama')
+   plt.show()
+   ```
+
+8. Visualisasi Rating Konten
+   - Distribusi rating konten (content_rt) divisualisasikan dengan bar chart.
+   ```python
+   drama['content_rt'].value_counts().plot(kind='bar', title='Distribusi Rating Konten')
+   plt.ylabel('Jumlah Drama')
+   plt.show()
+   ```
+
+9. Aktor dan Peran
+    - Distribusi peran dalam dataset actors divisualisasikan.
+    - 10 aktor dengan frekuensi kemunculan terbanyak ditampilkan menggunakan bar chart horizontal.
+   ```python
+    actors['role'].value_counts().plot(kind='bar', title='Distribusi Peran Aktor')
+   plt.ylabel('Jumlah')
+   plt.show()
+   
+   actors['actor_name'].value_counts().head(10).sort_values().plot(kind='barh', title='10 Aktor Terbanyak')
+   plt.xlabel('Jumlah Drama')
+   plt.show()
+   ```
 
 ## Data Preparation
 
@@ -418,80 +471,73 @@ Model dilatih menggunakan loss function Mean Squared Error (MSE) dan optimizer A
    
 ## Evaluation
 
-### Content Based Filtering
-Dalam content based filtering digunakan metrik evaluasi Precision@K adalah metrik evaluasi dalam sistem rekomendasi yang mengukur seberapa relevan item yang direkomendasikan oleh model dalam daftar K teratas.
+### Content-Based Filtering
 
-* Rumus untuk Precision@K
+Evaluasi pada pendekatan Content-Based Filtering dilakukan secara kualitatif dengan cara menguji apakah sistem mampu merekomendasikan drama yang relevan terhadap input pengguna. Evaluasi ini dilakukan dengan mengeksekusi fungsi `recommend()` pada beberapa drama populer dan memeriksa hasilnya secara manual.
 
-$$
-\text{Precision@K} = \frac{\text{Jumlah item relevan dalam K rekomendasi}}{\text{K}}
-$$
-
-* Cara Kerja: <br>
-  * Diambil sampel 100 pengguna secara acak dari data.
-  * Untuk setiap pengguna, dipilih satu anime yang pernah mereka beri rating tinggi (disukai) sebagai query anime.
-  * Dari query tersebut, sistem menghasilkan 5 anime teratas yang direkomendasikan menggunakan metode content-based filtering.
-  * Precision dihitung dengan membandingkan daftar 5 rekomendasi terhadap daftar anime yang benar-benar disukai oleh pengguna tersebut (ground truth).
-  * Proses ini diulang untuk seluruh 100 pengguna, dan nilai Precision@5 dirata-rata untuk mendapatkan skor keseluruhan (Average Precision@5).
-
-* Hasil Evaluasi
-  Berdasarkan evaluasi terhadap 100 pengguna, diperoleh hasil:
-
-$$
-\text{Average Precision@K} = 0.0560
-$$
-  
-  Artinya, secara rata-rata hanya 5,6% dari 5 rekomendasi teratas yang benar-benar sesuai dengan preferensi pengguna. Ini menunjukkan bahwa sistem mulai mampu menangkap preferensi pengguna, namun akurasinya masih perlu ditingkatkan.
+**Contoh Pengujian:**
+```python
+recommend("Crash Landing on You", 3)
+```
+Hasil rekomendasi menunjukkan bahwa sistem berhasil memberikan drama yang secara konten mirip dengan input, seperti genre romance, drama, dan latar militer atau supernatural. Ini menandakan bahwa TF-IDF Vectorizer yang digunakan mampu menangkap informasi penting dari fitur teks.
 
 ### Collaborative Filtering
-Dalam proyek ini digunakan Root Mean Squared Error (RMSE) sebagai metrik evaluasi utama. RMSE digunakan karena model ini berfokus pada prediksi nilai rating user terhadap anime, yang merupakan data kontinu (bukan klasifikasi).
 
-* Rumus RMSE:
+Dalam proyek ini digunakan **Root Mean Squared Error (RMSE)** sebagai metrik evaluasi utama. RMSE digunakan karena model berfokus pada prediksi nilai rating pengguna terhadap drama, yang merupakan data numerik kontinu.
 
+#### Rumus RMSE:
 $$
 \text{RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 }
 $$
 
-- $y_i$ = rating sebenarnya
-- $\hat{y}_i$ = rating yang diprediksi oleh model
-- $(n)$ = jumlah data
+- $y_i$: rating aktual dari pengguna
+- $\hat{y}_i$: rating hasil prediksi model
+- $n$: jumlah sampel data
 
-* Hasil RMSE pada data training dan validasi:
+#### Cara Kerja RMSE:
+- Mengukur jarak rata-rata kuadrat dari prediksi terhadap nilai asli.
+- Kesalahan dikalikan dengan dirinya sendiri agar positif.
+- Nilai akhir diakarkan agar satuannya kembali setara dengan rating asli.
+- Karena rating telah dinormalisasi ke 0–1, maka nilai RMSE juga akan berada pada rentang ini.
 
-  ![download](https://github.com/user-attachments/assets/f877aef8-6d68-4428-8465-b973d26033f6)
+#### Alasan Penggunaan RMSE:
+- Sangat cocok untuk tugas regresi seperti prediksi rating.
+- Memberikan penalti lebih besar untuk prediksi yang sangat meleset.
+- Memudahkan interpretasi karena hasilnya masih berada dalam skala rating.
 
-* Cara Kerja RMSE
-  RMSE menghitung selisih antara rating prediksi dan aktual, kemudian mengkuadratkan selisih tersebut agar tidak saling meniadakan (positif-negatif), menjumlahkannya, lalu diambil akar rata-rata kuadratnya. Dengan demikian:
-  * Semakin kecil nilai RMSE, semakin kecil rata-rata kesalahan prediksi model.
-  * Karena nilai rating dinormalisasi dalam rentang 0–1, maka RMSE juga berada di rentang 0–1.
+#### Visualisasi Hasil:
+Notebook memplot perkembangan RMSE pada data training dan validation selama proses pelatihan: 
 
-* Alasan Memilih RMSE
-  * Cocok untuk data regresi seperti prediksi rating.
-  * Peka terhadap error besar, sehingga model didorong untuk meminimalkan prediksi yang jauh meleset.
-  * Memudahkan interpretasi karena memiliki satuan yang sama dengan skala rating.
+```python
+plt.plot(history.history['root_mean_squared_error'])
+plt.plot(history.history['val_root_mean_squared_error'])
+plt.title('Model RMSE over Epochs')
+plt.ylabel('RMSE')
+plt.xlabel('Epoch')
+plt.legend(['Train', 'Validation'], loc='upper left')
+plt.show()
+```
 
 ### Analisis Terhadap Bussines Understanding
 1. Apakah Model Menjawab Setiap Problem Statement?
-   * Melalui sistem rekomendasi berbasis Content-Based dan Collaborative Filtering, pengguna kini diberikan rekomendasi yang lebih terfokus, sehingga dapat menyaring pilihan dari ribuan anime menjadi beberapa opsi yang paling relevan. Ini mengurangi beban pencarian secara manual.
-   * Model Collaborative Filtering berhasil mempelajari pola rating pengguna dan memberikan rekomendasi berdasarkan preferensi pengguna lain yang serupa. Hal ini menghasilkan rekomendasi yang lebih personal dibandingkan sekadar mengandalkan daftar anime populer.
-   * Melalui teknik embedding userID dan animeID, model Collaborative Filtering berhasil memanfaatkan histori rating pengguna dalam prediksi. Evaluasi menggunakan RMSE menunjukkan bahwa model mampu memprediksi rating dengan tingkat kesalahan yang relatif rendah, menandakan adanya pemanfaatan data histori yang efektif.
+   - Dalam konteks industri hiburan digital, khususnya K-Drama, pengguna sering mengalami information overload akibat terlalu banyaknya pilihan tontonan di berbagai platform streaming.
+   - Pendekatan Content-Based Filtering membantu dengan menyarankan drama yang mirip berdasarkan konten seperti genre dan aktor, sehingga pengguna dapat menemukan tontonan baru yang sesuai dengan selera mereka.
+   - Sementara itu, Collaborative Filtering mempelajari pola perilaku pengguna lain dengan preferensi serupa untuk memberikan rekomendasi yang lebih personal. Dengan kombinasi kedua pendekatan ini, sistem mampu menyederhanakan proses pencarian dan meningkatkan relevansi rekomendasi bagi pengguna.
 
 2. Apakah Setiap Goals Berhasil Dicapai?
-   * Model Collaborative Filtering telah dibangun dan diuji menggunakan data histori rating, serta menunjukkan performa yang baik melalui metrik RMSE.
-   * Kedua pendekatan telah berhasil diimplementasikan dan dievaluasi. Content-Based Filtering dievaluasi menggunakan Precision@5, sementara Collaborative Filtering menggunakan RMSE. Hasil evaluasi menunjukkan bahwa keduanya memberikan hasil yang berbeda, yang bisa digunakan untuk eksplorasi hibridisasi model di masa depan.
-   * Evaluasi telah dilakukan secara kuantitatif:
-     * Precision@5 = 0.056 untuk Content-Based Filtering.
-     * RMSE pada Collaborative Filtering menunjukkan nilai kesalahan prediksi yang cukup rendah.
+   - Model Collaborative Filtering telah dibangun dan dilatih menggunakan histori rating pengguna, menunjukkan performa yang baik melalui evaluasi menggunakan Root Mean Squared Error (RMSE).
+   - Model Content-Based Filtering juga telah berhasil diimplementasikan dan dievaluasi secara kualitatif. Rekomendasi yang diberikan sesuai dengan konten yang diminati pengguna.
+   - Sistem ini mampu menyaring ratusan pilihan menjadi beberapa tontonan yang relevan, yang menjadi salah satu tujuan utama proyek.
 
 3. Apakah Solusi yang Direncanakan Memberikan Dampak?
-   * Model ini terbukti mampu memberikan rekomendasi berbasis pola rating antar pengguna. RMSE yang rendah menunjukkan bahwa model dapat memprediksi rating dengan cukup baik, sehingga membantu pengguna menemukan anime baru yang sesuai dengan preferensinya. Ini sangat relevan dengan kebutuhan sistem rekomendasi yang personal.
-   * Meskipun nilai Precision@5 masih rendah (5,6%), sistem ini menunjukkan kemampuan awal dalam menangkap kemiripan konten, terutama berdasarkan genre. Ini bisa menjadi pondasi awal untuk pengembangan sistem rekomendasi berbasis konten yang lebih kaya, seperti menggunakan sinopsis, studio, atau bahkan data audio-visual di masa depan.
+   - Sistem rekomendasi yang dibangun berperan dalam membantu pengguna memilih tontonan dengan lebih cepat dan sesuai minat, yang mengurangi beban mental akibat informasi berlebih.
+   - Rekomendasi berbasis histori dan preferensi membuat pengalaman pengguna menjadi lebih personal dan menyenangkan.
+   - Proyek ini juga membuka peluang pengembangan lebih lanjut, seperti mengintegrasikan sinopsis, ulasan visual, atau perilaku tontonan real-time untuk meningkatkan kualitas rekomendasi.
 
 ### Kesimpulan
 Secara keseluruhan, model yang dibangun telah berhasil menjawab seluruh problem statements, mencapai goals yang ditetapkan, dan solusi yang dirancang terbukti memberikan dampak yang nyata, meskipun dengan tingkat akurasi yang bervariasi. Collaborative Filtering menunjukkan performa yang lebih unggul dan efektif dalam memberikan rekomendasi yang personal, sedangkan Content-Based Filtering memberikan pendekatan alternatif yang masih memiliki ruang untuk ditingkatkan. Dengan demikian, proyek ini telah menunjukkan kontribusi nyata dalam meningkatkan pengalaman pengguna dalam menemukan anime yang sesuai dengan preferensi mereka.
 
 ## Referensi
-> He, X., Liao, L., Zhang, H., Nie, L., Hu, X., & Chua, T. S. (2017). Neural collaborative filtering. Proceedings of the 26th International Conference on World Wide Web, 173–182. https://doi.org/10.1145/3038912.3052569
 > 
 > Ricci, F., Rokach, L., & Shapira, B. (2015). Recommender Systems Handbook (2nd ed.). Springer. https://doi.org/10.1007/978-1-4899-7637-6
 > 
