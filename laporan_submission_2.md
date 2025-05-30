@@ -1,48 +1,53 @@
-# Laporan Proyek Machine Learning - Dwi Sandi Kalla
+# Laporan Proyek Machine Learning - Meicha Salsabila Budiyanti
 
 ## Project Overview
 
-Pertumbuhan industri hiburan digital khususnya dalam bidang anime telah berkembang pesat dalam dekade terakhir. Berdasarkan laporan dari Anime News Network, setiap tahunnya terdapat lebih dari 200 judul anime baru yang dirilis hanya di Jepang. Situasi ini menyebabkan information overload, yaitu kondisi di mana pengguna menghadapi terlalu banyak pilihan sehingga kesulitan dalam memilih konten yang sesuai dengan preferensi mereka (Ricci, Rokach, & Shapira, 2015).
+Pertumbuhan industri hiburan digital, khususnya dalam bidang drama Korea (K-Drama), telah mengalami perkembangan pesat dalam beberapa tahun terakhir. Popularitas K-Drama yang semakin mendunia menyebabkan meningkatnya jumlah rilisan setiap tahunnya. Kondisi ini menimbulkan information overload, yaitu situasi di mana pengguna menghadapi terlalu banyak pilihan sehingga kesulitan dalam menentukan tontonan yang sesuai dengan preferensi mereka (Ricci, Rokach, & Shapira, 2015).
 
-Salah satu solusi efektif dalam permasalahan ini adalah penggunaan sistem rekomendasi. Sistem rekomendasi mampu memberikan saran personal berdasarkan pola interaksi pengguna dengan konten sebelumnya, dan telah banyak digunakan pada platform seperti Netflix, YouTube, dan Spotify (Su & Khoshgoftaar, 2009). Di ranah anime, sistem rekomendasi tidak hanya meningkatkan pengalaman pengguna, tetapi juga membantu meningkatkan retensi dan engagement pengguna terhadap platform distribusi anime seperti MyAnimeList atau AniList.
+Salah satu solusi efektif untuk mengatasi permasalahan ini adalah dengan menggunakan sistem rekomendasi. Sistem rekomendasi mampu memberikan saran personal berdasarkan histori interaksi pengguna terhadap konten, dan telah diimplementasikan secara luas pada platform seperti Netflix, YouTube, dan Spotify (Su & Khoshgoftaar, 2009). Dalam konteks K-Drama, sistem rekomendasi tidak hanya meningkatkan kepuasan pengguna, tetapi juga berdampak pada retensi dan peningkatan engagement terhadap platform streaming.
 
-Sistem rekomendasi tradisional seperti popularity-based atau content-based filtering cenderung kurang akurat karena tidak memperhatikan perilaku kolektif pengguna (Schäfer et al., 2007). Sebaliknya, pendekatan Collaborative Filtering (CF) menawarkan akurasi yang lebih tinggi dengan cara memanfaatkan informasi dari pengguna lain yang memiliki preferensi serupa.
+Pendekatan sistem rekomendasi konvensional seperti popularity-based atau content-based filtering memiliki keterbatasan karena kurang mampu menangkap preferensi kolektif pengguna (Schäfer et al., 2007). Sebaliknya, Collaborative Filtering (CF) memanfaatkan interaksi antar pengguna untuk mengidentifikasi pola dan memberikan rekomendasi yang lebih relevan.
 
-Namun, pendekatan CF konvensional seperti matrix factorization memiliki keterbatasan dalam menangkap non-linearitas dan kompleksitas hubungan antar pengguna dan item. Oleh karena itu, pendekatan modern seperti Neural Collaborative Filtering (NCF), yang menggabungkan teknik deep learning dengan collaborative filtering, menjadi solusi yang lebih powerful dalam mengatasi kelemahan tersebut (He et al., 2017).
+Dalam proyek ini, dikembangkan sebuah sistem rekomendasi drama Korea berbasis Neural Collaborative Filtering (NCF) menggunakan TensorFlow dan Keras. Model ini memanfaatkan data interaksi pengguna dan drama berupa rating yang terdapat pada dataset reviews.csv. Dataset tambahan korean_drama.csv dan wiki_actors.csv digunakan untuk eksplorasi dan analisis, tetapi model difokuskan pada relasi user-item berdasarkan rating.
 
-Dalam proyek ini, dikembangkan sebuah sistem rekomendasi anime berbasis Neural Collaborative Filtering dengan memanfaatkan data interaksi user-anime berupa rating. Model dirancang menggunakan framework TensorFlow dan memanfaatkan embedding layers untuk merepresentasikan masing-masing pengguna dan anime dalam ruang vektor berdimensi rendah. Prediksi dilakukan dengan menghitung dot product dari vektor pengguna dan anime, disertai bias, untuk menghasilkan skor rating prediktif.
+Model dirancang dengan menggunakan embedding layers untuk merepresentasikan masing-masing pengguna dan drama dalam bentuk vektor berdimensi rendah. Representasi tersebut kemudian digabungkan dan diproses melalui beberapa lapisan neural network untuk memodelkan hubungan non-linear antar pengguna dan item. Proses pelatihan dilakukan menggunakan pendekatan pembelajaran terawasi dengan target rating, dan model dievaluasi menggunakan metrik Root Mean Squared Error (RMSE) untuk mengukur akurasi prediksi.
 
-Sistem ini diharapkan mampu memberikan saran yang lebih personal dan relevan kepada pengguna berdasarkan preferensi mereka sebelumnya. Model juga dievaluasi menggunakan metrik seperti Root Mean Squared Error (RMSE) untuk mengukur akurasi prediksi rating.
+Sistem ini diharapkan mampu memberikan rekomendasi yang lebih personal, akurat, dan kontekstual, serta menjadi fondasi bagi pengembangan sistem rekomendasi berbasis deep learning yang lebih lanjut dalam domain hiburan digital, khususnya K-Drama.
 
 ## Business Understanding
 
-Seiring pertumbuhan industri hiburan Jepang, jumlah anime yang tersedia meningkat secara signifikan setiap tahunnya. Banyaknya pilihan ini membuat pengguna mengalami kesulitan dalam menentukan anime yang sesuai dengan preferensi mereka. Oleh karena itu, dibutuhkan sistem yang mampu memberikan rekomendasi anime secara personal.
+Industri hiburan digital, khususnya drama Korea (K-Drama), berkembang sangat pesat dalam beberapa tahun terakhir. Dengan semakin banyaknya platform streaming seperti Netflix, Viu, dan iQIYI, jumlah K-Drama yang dirilis tiap tahun pun ikut meningkat. Kini, penonton bisa memilih dari ratusan judul dengan berbagai genre dan aktor yang berbeda-beda.
+
+Namun, banyaknya pilihan ini justru bisa membuat bingung. Pengguna sering merasa kesulitan menentukan tontonan mana yang paling cocok dengan selera mereka. Terlalu banyak pilihan membuat sebagian orang kewalahan dan akhirnya malah tidak tahu harus menonton apa. Masalah ini dikenal sebagai information overload, yaitu kondisi ketika terlalu banyak informasi membuat seseorang sulit mengambil keputusan. Oleh karena itu, dibutuhkan sistem yang bisa membantu pengguna dalam memilih tontonan yang sesuai dengan minat mereka secara lebih mudah dan cepat.
 
 Dalam proyek ini, dibangun sebuah sistem rekomendasi anime berbasis pembelajaran mesin yang bertujuan untuk membantu pengguna menemukan anime yang relevan dengan minat dan histori penontonan mereka. Sistem rekomendasi ini berfokus pada dua pendekatan utama, yaitu Collaborative Filtering dan Content-Based Filtering.
 
 ### Problem Statements
 
-1. Terlalu banyak pilihan anime membuat pengguna kesulitan menemukan tontonan yang sesuai dengan preferensi mereka.
+1. Terlalu banyak pilihan K-Drama membuat pengguna kesulitan menemukan tontonan yang sesuai dengan preferensi mereka.
 
-2. Rekomendasi umum (berdasarkan popularitas) belum tentu sesuai dengan selera individual pengguna.
+2. Bagaimana menyajikan rekomendasi tontonan K-Drama yang sesuai dengan preferensi unik setiap pengguna?
+   
+3. Bagaimana memanfaatkan baik informasi konten drama maupun interaksi pengguna sebelumnya untuk menghasilkan rekomendasi yang akurat?
 
-3. Kurangnya pemanfaatan data histori pengguna secara efektif dalam memberikan rekomendasi yang personal.
+4. Kurangnya pemanfaatan data histori pengguna secara efektif dalam memberikan rekomendasi yang personal.
 
 ### Goals
 
-1. Membangun sistem rekomendasi anime yang dapat menyarankan anime berdasarkan histori penilaian pengguna terhadap anime sebelumnya.
-
-2. Mengimplementasikan dua pendekatan utama sistem rekomendasi, yaitu Collaborative Filtering dan Content-Based Filtering, untuk membandingkan performa keduanya dalam menghasilkan rekomendasi.
-
-3. Melakukan pengujian sistem rekomendasi dengan mengevaluasi akurasi hasil rekomendasi berdasarkan data rating pengguna.
+1. Mengembangkan sistem rekomendasi untuk K-Drama yang mampu memberikan saran tontonan secara personal dan relevan.
+ 
+2. Memberikan pengalaman pengguna yang lebih baik dan meningkatkan keterlibatan pengguna terhadap platform penyedia K-Drama.
+   
+3. Mengimplementasikan dua pendekatan utama sistem rekomendasi, yaitu Collaborative Filtering dan Content-Based Filtering, untuk membandingkan performa keduanya dalam menghasilkan rekomendasi.
+   
+4. Melakukan pengujian sistem rekomendasi dengan mengevaluasi akurasi hasil rekomendasi berdasarkan data rating pengguna.
 
 ### Solution Statements
 
 Untuk mencapai tujuan di atas, berikut adalah dua pendekatan solusi yang digunakan dalam proyek ini:
-1. Collaborative Filtering : Pendekatan ini menggunakan interaksi pengguna dengan anime dalam bentuk rating. Sistem mempelajari pola dari rating antar pengguna dan mencoba merekomendasikan anime yang disukai oleh pengguna lain dengan selera serupa. Dalam implementasinya, model dibangun menggunakan teknik embedding terhadap userID dan animeID, dilanjutkan dengan beberapa lapisan dense neural network untuk memprediksi rating.
+1. Collaborative Filtering :Pendekatan ini memberikan rekomendasi berdasarkan kemiripan fitur antar drama, seperti genre dan aktor. Sistem menghitung cosine similarity antara drama yang pernah ditonton pengguna dan drama lainnya, lalu merekomendasikan drama yang paling mirip. Data yang digunakan berasal dari file korean_drama.csv dan wiki_actors.csv. Fitur-fitur penting (genre dan aktor) diolah dan digunakan untuk membentuk representasi teks (TF-IDF). Cosine similarity digunakan untuk mengukur kemiripan antar drama.
 
-2. Content-Based Filtering : Pendekatan ini memberikan rekomendasi berdasarkan kemiripan konten, dalam hal ini adalah genre anime. Sistem menyarankan anime lain yang memiliki genre serupa dengan anime yang sebelumnya disukai atau diberi rating tinggi oleh pengguna.
-
+2. Content-Based Filtering : Pendekatan ini memberikan rekomendasi dengan memanfaatkan interaksi pengguna sebelumnya, khususnya rating. NCF digunakan untuk menangkap pola non-linear dalam preferensi pengguna. Data interaksi pengguna diambil dari reviews.csv. Model dibangun menggunakan TensorFlow dan memanfaatkan embedding layers untuk mewakili pengguna dan item dalam ruang vektor berdimensi rendah. Prediksi skor rating dilakukan melalui dot product dari vektor embedding pengguna dan item, serta bias. Model dievaluasi menggunakan Root Mean Squared Error (RMSE).
 
 ## Data Understanding
 Dataset yang digunakan dalam proyek ini merupakan gabungan dari dua sumber utama, yaitu:
