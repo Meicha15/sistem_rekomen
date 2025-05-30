@@ -50,38 +50,30 @@ Untuk mencapai tujuan di atas, berikut adalah dua pendekatan solusi yang digunak
 2. Content-Based Filtering : Pendekatan ini memberikan rekomendasi dengan memanfaatkan interaksi pengguna sebelumnya, khususnya rating. NCF digunakan untuk menangkap pola non-linear dalam preferensi pengguna. Data interaksi pengguna diambil dari reviews.csv. Model dibangun menggunakan TensorFlow dan memanfaatkan embedding layers untuk mewakili pengguna dan item dalam ruang vektor berdimensi rendah. Prediksi skor rating dilakukan melalui dot product dari vektor embedding pengguna dan item, serta bias. Model dievaluasi menggunakan Root Mean Squared Error (RMSE).
 
 ## Data Understanding
-Dataset yang digunakan dalam proyek ini merupakan gabungan dari dua sumber utama, yaitu:
+Dataset yang digunakan dalam proyek ini merupakan gabungan dari tiga sumber utama, yaitu:
 
-* Anime Dataset: berisi informasi mengenai daftar anime beserta genre-nya.
+* korean_drama.csv – berisi informasi deskriptif tentang drama Korea.
 
-* Rating Dataset: berisi data penilaian atau rating yang diberikan oleh pengguna terhadap anime tertentu.
+* reviews.csv – berisi ulasan pengguna terhadap drama.
 
-Dataset ini diambil dari [Kaggle](https://www.kaggle.com/datasets/CooperUnion/anime-recommendations-database/data). Terdapat dua file berformat csv pada dataset, yaitu anime.csv dan rating.csv. Beberapa rincian penjelasan dataset ini sebagai berikut:
+* wiki_actors.csv – berisi informasi aktor yang membintangi drama.
+
+Dataset ini diambil dari [Kaggle](https://www.kaggle.com/datasets/chanoncharuchinda/korean-drama-2015-23-actor-and-reviewmydramalist). Terdapat tiga file berformat csv pada dataset, yaitu korean_drama.csv, reviews.csv, dan wiki-actors.csv. Beberapa rincian penjelasan dataset ini sebagai berikut:
 
 ### Statistika Dataset
 
-* Anime Dataset (anime.csv)
-  * Jumlah entri: 12294 baris
-  * Jumlah kolom: 7 fitur
-* Rating Dataset (rating.csv)
-  * Jumlah entri: 7813737 baris
-  * Jumlah kolom: 3 fitur
+| Nama File          | Jumlah Baris | Jumlah Kolom | Deskripsi Singkat                                   |
+| ------------------ | ------------ | ------------ | --------------------------------------------------- |
+| korean_drama.csv | 1.752        | 17           | Metadata drama Korea 2015–2023                      |
+| reviews.csv      | 10.625       | 10           | Ulasan dan rating pengguna                          |
+| wiki_actors.csv  | 8.659        | 5            | Nama aktor dan karakter yang diperankan dalam drama |
+
 
 ### Deskripsi Fitur
 
-1. Dataset Anime (anime.csv)
-   * **anime_id** (_int64_): ID unik untuk setiap anime.
-   * **name** (_object_): Nama atau judul dari anime.
-   * **genre** (_object_): Daftar genre yang terkait dengan anime (contoh: Action, Comedy, dll).
-   * **type** (_object_): Tipe anime seperti TV, Movie, OVA, dll.
-   * **episodes** (_object_): Jumlah episode anime (beberapa nilai tidak diketahui, ditandai dengan 'Unknown').
-   * **rating** (_float64_): Rata-rata rating yang diberikan pengguna MyAnimeList terhadap anime (bukan individual rating).
-   * **members** (_int64_): Jumlah pengguna MyAnimeList yang menambahkan anime ke daftar mereka.
-
-2. Dataset Rating (rating.csv)
-   * **user_id** (_int64_): ID unik pengguna.
-   * **anime_id** (_int64_): ID anime yang diberi rating oleh pengguna.
-   * **rating** (_int64_): Nilai rating yang diberikan oleh pengguna terhadap anime. Nilai -1 berarti pengguna telah menonton tetapi tidak memberikan rating eksplisit.
+1. Dataset Korean Drama (korean_drama.csv)
+2. Dataset Reviews (reviews.csv)
+3. Dataset Actors (wiki_actors.csv)
 
 ### Exploratory Data Analysis (EDA)
 
