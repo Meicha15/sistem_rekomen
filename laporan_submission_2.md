@@ -164,72 +164,109 @@ Dataset ini diambil dari [Kaggle](https://www.kaggle.com/datasets/chanoncharuchi
      ![type](https://github.com/user-attachments/assets/08600727-fa24-4a4b-8018-05244793e08d)
 
 ## Data Preparation
-1. Menghapus Duplikasi pada Dataset Anime
+
+Pada tahap ini, dilakukan serangkaian proses untuk membersihkan dan menyiapkan data sebelum digunakan dalam pemodelan machine learning. Langkah-langkah preprocessing disusun secara sistematis agar data yang digunakan berkualitas dan konsisten.
+
+1. Menyalin Dataset Asli
+   Dataset utama disalin terlebih dahulu agar proses pembersihan tidak memengaruhi data mentah.
    ```python
-   anime.drop_duplicates(inplace=True)
+   drama_clean = drama.copy()
+   review_clean = review.copy()
+   actors_clean = actors.copy()
    ```
-   Menghapus duplikasi baris pada dataset anime diperlukan untuk menghindari bias dalam sistem rekomendasi. Duplikasi dapat menyebabkan item tertentu muncul lebih dari sekali, yang akan memengaruhi distribusi rekomendasi dan hasil evaluasi model.
 
 2. Menghapus Nilai Kosong (_Missing Value_)
    ```python
-   anime = anime.dropna()
-   anime.reset_index(drop=True, inplace=True)
+   drama_clean['synopsis'] = drama_clean['synopsis'].fillna('')
+   drama_clean['aired_on'] = drama_clean['aired_on'].fillna('Unknown')
+   drama_clean['org_net'] = drama_clean['org_net'].fillna('Unknown')
+   drama_clean['duration'] = drama_clean['duration'].fillna(drama_clean['duration'].median())
+   review_clean['review_text'] = review_clean['review_text'].fillna('')
    ```
    Baris dengan nilai kosong dihapus untuk menghindari error atau hasil yang tidak akurat selama pemodelan. Fitur seperti genre, type, rating, dan members sangat penting untuk pemrosesan lebih lanjut (terutama pada Content-Based Filtering), sehingga missing value perlu dihilangkan.
 
-3. Menghapus Rating tidak Valid
+3. Menghapus Kolom dengan Banyak Missing Value
    ```python
-   rating = rating[rating['rating'] != -1]
+   drama_clean.drop(columns=['director', 'screenwriter'], inplace=True)
    ```
-   Dalam dataset rating, nilai -1 menandakan bahwa pengguna belum memberikan penilaian terhadap anime tersebut. Data ini tidak relevan dalam sistem rekomendasi berbasis rating karena tidak mencerminkan preferensi pengguna.
+   Penghapusan ini dilakukan agar data tidak tercemar oleh fitur yang tidak lengkap dan dapat menyebabkan noise pada model.
 
-4. Menghapus Duplikasi pada Dataset Rating
+4. Reset Index Setelah Pembersihan
    ```python
-   rating.drop_duplicates(inplace=True)
-   rating.reset_index(drop=True, inplace=True)
+   drama_clean.reset_index(drop=True, inplace=True)
+   review_clean.reset_index(drop=True, inplace=True)
    ```
-   Duplikasi dalam data rating dapat menyebabkan bias pada rekomendasi, terutama dalam algoritma Collaborative Filtering. Setiap pengguna seharusnya memberikan satu rating untuk satu anime.
+   Index di-reset setelah data dibersihkan agar struktur data lebih rapi dan siap digabungkan di tahap selanjutnya.
 
-5. Menyaring Anime yang Tersedia
+5. Sinkronisasi Review dengan Data Drama
    ```python
-   rating = rating[rating['anime_id'].isin(anime['anime_id'])]
+   review_clean = review_clean[review_clean['title'].isin(drama_clean['drama_name'])]
    ```
-   Langkah ini memastikan bahwa hanya anime yang tersedia di dataset anime yang digunakan dalam dataset rating. Hal ini menjaga konsistensi dan integritas data yang akan digunakan dalam sistem rekomendasi.
+   Review yang tidak memiliki kecocokan dengan judul drama dalam dataset utama dihapus untuk menjaga konsistensi antar data. Langkah ini memastikan bahwa hanya review yang benar-benar relevan dengan drama yang tersedia yang digunakan.
 
-6. Sampling Rating
+6. Sampling Review
    ```python
-   rating_per_anime = rating.groupby('anime_id').apply(lambda x: x.sample(min(len(x), 100), random_state=42)).reset_index(drop=True)
+   review_per_drama = review_clean.groupby('title').apply(lambda x: x.sample(min(len(x), 100), random_state=42)).reset_index(drop=True)
    ```
-   Untuk mengurangi ukuran data dan mempercepat proses training model, dilakukan sampling maksimal 100 rating per anime. Sampling ini mempertahankan keberagaman data namun tetap efisien secara komputasi.
+   Untuk mencegah dominasi dari drama tertentu yang memiliki terlalu banyak review, dilakukan sampling maksimal 100 review per drama. Sampling ini menjaga distribusi data tetap seimbang dan mempercepat proses pelatihan model.
 
-7. Penggabungan Dataset Anime dan Rating
+7. Penggabungan Dataset
+
+   Beberapa penggabungan dilakukan untuk menyatukan data dari berbagai sumber agar analisis dan pemodelan dapat dilakukan dengan menyeluruh.
+   
    ```python
-   anime_rating = pd.merge(rating_per_anime, anime, on='anime_id')
-   ```
-   Dataset anime_rating merupakan gabungan dari dataset anime dan rating berdasarkan kolom anime_id. Dataset ini berisi informasi lengkap yang dibutuhkan untuk model Collaborative Filtering (berbasis user-anime-rating) dan Content-Based Filtering (berbasis fitur seperti genre dan type).
+   # Gabungkan review dengan info drama
+   drama_review = pd.merge(review_per_drama, drama_clean, left_on='title', right_on='drama_name')
+   
+   # Gabungkan dengan data aktor
+   full_data = pd.merge(drama_review, actors, on='drama_name', how='left')
 
-8. Final Check
+   Penggabungan ini penting untuk membuat satu dataset terpadu yang mengandung informasi drama, ulasan, dan aktor dalam satu struktur data yang siap digunakan dalam modeling. Dataset ini berisi informasi lengkap yang dibutuhkan untuk model Collaborative Filtering (berbasis user-anime-rating) dan Content-Based Filtering (berbasis fitur seperti genre dan type).
+
+8. Menghapus Nilai Kosong pada Data Gabungan
    ```python
-   anime_rating.info()
-   anime_rating.isnull().sum()
-   anime_rating.head()
+   full_data.dropna(inplace=True)
    ```
-   Langkah ini dilakukan untuk memastikan tidak ada missing value yang tersisa dan struktur data sudah siap digunakan pada tahap modeling.
+   Setelah semua data digabungkan, sisa nilai kosong yang ada dihapus agar dataset benar-benar bersih.. Langkah ini dilakukan untuk memastikan tidak ada missing value yang tersisa dan struktur data sudah siap digunakan pada tahap modeling.
 
+9. Final Check
+   ```python
+   full_data.info()
+   full_data.isnull().sum()
+   full_data.head()
+   ```
+   Pemeriksaan akhir dilakukan untuk memastikan bahwa struktur data sudah bersih dan siap digunakan. Pemeriksaan ini memastikan tidak ada nilai kosong yang tersisa dan data sudah dalam format yang sesuai.
+   
 ### Content Based Filtering
-1. Menghapus Duplikat dan mengisi dengan string
+1. Menghapus Duplikat dan Mengisi Kolom Kosong
    ```python
-   data = anime_rating[['anime_id', 'name', 'genre']].drop_duplicates()
-   data['genre'] = data['genre'].fillna('')
+   drama_content = drama_content.drop_duplicates(subset='drama_name', keep='first').reset_index(drop=True)
+   drama_content['combined'] = drama_content['review_text'].fillna('') + ' ' + \
+                                drama_content['actor_name'].fillna('') + ' ' + \
+                                drama_content['title'].fillna('')
    ```
-   Kode tersebut bertujuan untuk mempersiapkan data anime dengan memilih kolom anime_id, name, dan genre dari dataframe anime_rating, kemudian menghapus baris duplikat berdasarkan kombinasi nilai di ketiga kolom tersebut. Selanjutnya, nilai yang hilang atau kosong pada kolom genre akan diisi dengan string kosong (''), memastikan tidak ada nilai NaN yang mengganggu analisis lebih lanjut pada kolom genre.
+   Dataset drama_content merupakan gabungan ulasan, aktor, dan judul dari setiap drama. Duplikat berdasarkan drama_name dihapus untuk memastikan setiap drama hanya muncul sekali. Selanjutnya, kolom teks yang masih kosong diisi dengan string kosong ('') agar bisa diproses dalam tahap tokenisasi.
    
 2. TF-IDF
    ```python
+   from sklearn.feature_extraction.text import TfidfVectorizer
    tfidf = TfidfVectorizer(stop_words='english')
-   tfidf_matrix = tfidf.fit_transform(data['genre'])
+   tfidf_matrix = tfidf.fit_transform(drama_content['combined'])
    ```
-   Memproses fitur teks pada kolom genre diubah menjadi representasi numerik menggunakan metode TF-IDF (Term Frequency-Inverse Document Frequency). TF-IDF ini membantu mengekstrak informasi penting dari deskripsi genre dengan mengurangi pengaruh kata-kata umum (stop words) dalam bahasa Inggris.
+   Metode TF-IDF digunakan untuk mengubah kolom gabungan teks (review_text, actor_name, title) menjadi representasi numerik. TF-IDF membantu mengidentifikasi kata-kata yang paling penting dan khas dari tiap drama, sambil mengabaikan kata-kata umum (stop words). Representasi ini diperlukan untuk menghitung kemiripan antar drama.
+
+3. Cosine Similarity
+   ```python
+   from sklearn.metrics.pairwise import cosine_similarity
+   cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+   ```
+   Cosine Similarity digunakan untuk mengukur sejauh mana dua drama memiliki konten yang mirip berdasarkan vektor TF-IDF. Hasil dari cosine similarity ini menjadi dasar sistem rekomendasi drama yang mirip.
+
+4. Index Mapping
+   ```python
+   indices = pd.Series(drama_content.index, index=drama_content['drama_name'].str.lower())
+   ```
+   Langkah ini memetakan judul drama ke indeks baris yang sesuai dalam dataset. Hal ini penting agar sistem rekomendasi dapat dengan cepat mencari dan memberikan rekomendasi berdasarkan kemiripan dengan drama lainnya. Mapping ini memungkinkan pencarian yang efisien dan akurat.
 
 ### Colaborative Filtering
 1. Encoding
