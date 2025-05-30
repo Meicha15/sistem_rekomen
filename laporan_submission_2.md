@@ -271,151 +271,150 @@ Pada tahap ini, dilakukan serangkaian proses untuk membersihkan dan menyiapkan d
 ### Colaborative Filtering
 1. Encoding
     ```python
-    user_ids = df['userID'].unique().tolist()
-    anime_ids = df['animeID'].unique().tolist()
-    
-    user_to_encoded = {x: i for i, x in enumerate(user_ids)}
-    anime_to_encoded = {x: i for i, x in enumerate(anime_ids)}
-    
-    df['user'] = df['userID'].map(user_to_encoded)
-    df['anime'] = df['animeID'].map(anime_to_encoded)
+   user_ids = df['user_id'].unique().tolist()
+   title_ids = df['title'].unique().tolist()
+   
+   user_to_index = {x: i for i, x in enumerate(user_ids)}
+   title_to_index = {x: i for i, x in enumerate(title_ids)}
+   
+   df['user'] = df['user_id'].map(user_to_index)
+   df['title_id'] = df['title'].map(title_to_index)
     ```
-    Kode ini bertujuan mengubah ID asli pengguna (userID) dan anime (animeID) menjadi indeks numerik yang berurutan mulai dari 0. Proses ini penting untuk collaborative filtering karena algoritma tersebut biasanya membutuhkan input dalam bentuk indeks numerik agar dapat mengelola data dengan efisien, seperti membangun matriks interaksi pengguna-anime. Dengan cara ini, data menjadi lebih mudah diolah dalam model rekomendasi.
+    Kode ini mengubah ID pengguna (user_id) dan ID judul drama (title) menjadi indeks numerik yang berurutan mulai dari 0. Proses ini diperlukan dalam collaborative filtering karena algoritma ini membutuhkan input numerik untuk membangun matriks interaksi pengguna-drama. Dengan menggunakan indeks numerik, data lebih mudah dikelola dalam model rekomendasi.
 
-2. Normalisasi Data
+2. Splitting Data
     ```python
-    df['rating_x'] = df['rating_x'].astype('float32')
-    min_rating, max_rating = df['rating_x'].min(), df['rating_x'].max()
-    df['norm_rating'] = df['rating_x'].apply(lambda x: (x - min_rating) / (max_rating - min_rating))
+   X = df[['user', 'title_id']]
+   y = df['overall_score']
+   
+   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     ```
-    Proses ini melakukan normalisasi nilai rating agar berada dalam rentang 0 hingga 1. Pertama, tipe data rating diubah ke float32 untuk efisiensi memori dan konsistensi tipe data. Kemudian, nilai rating asli diubah menggunakan rumus normalisasi min-max, yaitu menggeser dan menskalakan semua nilai supaya proporsional antara nilai minimum dan maksimum. Normalisasi ini penting dalam collaborative filtering atau model machine learning lainnya agar skala nilai rating seragam, sehingga model dapat belajar dengan lebih stabil dan menghasilkan rekomendasi yang lebih akurat.
-
-3. Pengacakan Data
-    ```python
-    df = df.sample(frac=1, random_state=42)
-    ```
-    Kode ini melakukan pengacakan (shuffling) pada seluruh baris data secara acak menggunakan sample dengan parameter frac=1, yang berarti mengambil 100% data dalam urutan acak. random_state=42 digunakan agar hasil pengacakan dapat direproduksi secara konsisten. Pengacakan data penting untuk memastikan model machine learning atau collaborative filtering tidak terpengaruh oleh urutan data asli, sehingga proses pelatihan dan evaluasi model menjadi lebih adil dan hasilnya lebih general.
-
-4. Splitting Data
-    ```python
-    x = df[['user', 'anime']].values
-    y = df['norm_rating'].values
-    x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_state=42)
-    ```
-    Kode ini memisahkan data fitur (user, anime) dan target (norm_rating), lalu membaginya menjadi data latih dan validasi dengan rasio 80:20. Pembagian ini penting agar model dapat dilatih dan diuji secara adil menggunakan data yang berbeda, serta memastikan hasil evaluasi lebih akurat.
+    Data kemudian dibagi menjadi data latih (training set) dan data uji (testing set) dengan rasio 80:20 menggunakan train_test_split. Pembagian ini penting agar model dapat dilatih menggunakan sebagian data dan dievaluasi menggunakan data yang belum pernah dilihat sebelumnya, untuk menghindari overfitting.
 
 ## Modeling
-Dalam proyek ini, saya membangun dua pendekatan berbeda untuk sistem rekomendasi anime, yaitu Content-Based Filtering dan Collaborative Filtering. Masing-masing pendekatan dirancang untuk menjawab permasalahan dalam merekomendasikan anime kepada pengguna secara personal dan relevan.
 
-1. Content-Based Filtering
-   Content-Based Filtering merekomendasikan anime yang memiliki kemiripan genre dengan anime yang disukai oleh pengguna. Sistem ini hanya memerlukan informasi konten dari item (dalam hal ini: genre dari anime) dan tidak tergantung pada data pengguna lain. Berikut adalah langkah-langkahnya:
-   * Mengambil data anime_id, name, dan genre.
-   * Mengubah teks genre menjadi representasi numerik menggunakan TF-IDF Vectorizer.
-   * Menghitung kemiripan antar anime menggunakan Cosine Similarity.
-   * Mengembalikan anime yang paling mirip dengan input yang diberikan.
+Dalam proyek ini, saya membangun dua pendekatan berbeda untuk sistem rekomendasi drama, yaitu **Content-Based Filtering** dan **Collaborative Filtering**. Masing-masing pendekatan dirancang untuk menyajikan rekomendasi yang personal dan relevan kepada pengguna berdasarkan data yang tersedia.
 
-   * Kelebihan :
-    * Tidak membutuhkan data pengguna.
-    * Cocok untuk item-item baru yang belum memiliki rating (cold start untuk item).
-    * Hasil rekomendasi dapat dijelaskan karena didasarkan pada fitur konten (misalnya genre mirip).
+---
 
-   * Kekurangan :
-    * Terbatas hanya pada kemiripan konten — tidak bisa menangkap preferensi pengguna yang kompleks.
-    * Tidak bisa merekomendasikan anime di luar genre yang sudah disukai.
-  
-   * Cara Kerja Cosine Similarity:
-     Cosine similarity mengukur tingkat kemiripan antara dua vektor dengan menghitung cosinus sudut di antara keduanya. Rumusnya adalah sebagai berikut:
+### 1. Content-Based Filtering
 
-    $$
- \text{cosine similarity} = \frac{\vec{A} \cdot \vec{B}}{\|\vec{A}\| \cdot \|\vec{B}\|}
-   $$
+Content-Based Filtering merekomendasikan drama yang memiliki kemiripan berdasarkan konten—dalam hal ini, teks gabungan dari **review**, **nama aktor**, dan **judul** drama. Sistem ini hanya memerlukan informasi konten dari item, tanpa perlu mengetahui preferensi pengguna lain.
 
-   Contoh Penerapan:
-   ```python
-   anime_recommendations('Naruto')
-   ```
-   Output:
-   1. Boruto: Naruto the Movie - Naruto ga Hokage ni...
-   2. Naruto Shippuuden: Sunny Side Battle
-   3. Naruto x UT
-   4. Naruto: Shippuuden Movie 4 - The Lost Tower
-   5. Boruto: Naruto the Movie
+**Langkah-langkah:**
+- Menggabungkan fitur teks (`review_text`, `actor_name`, `title`) ke dalam satu kolom (`combined`).
+- Mengubah teks gabungan menjadi representasi numerik menggunakan **TF-IDF Vectorizer**.
+- Menghitung kemiripan antar drama menggunakan **Cosine Similarity**.
+- Membangun fungsi `recommend()` untuk mengembalikan drama yang paling mirip berdasarkan input judul atau nama aktor.
 
-3. Collaborative Filtering
-   Collaborative Filtering mempelajari hubungan antara pengguna dan anime berdasarkan rating yang diberikan, tanpa melihat isi konten anime itu sendiri. Model ini dibuat menggunakan pendekatan Matrix Factorization dengan TensorFlow.
+**Kelebihan:**
+- Tidak membutuhkan data pengguna (cocok untuk cold start pada item baru).
+- Dapat menjelaskan alasan rekomendasi (misalnya karena genre atau kontennya mirip).
 
-   * Langkah-langkah:
-     * Encoding user dan anime ke dalam ID numerik.
-     * Menormalisasi rating dari skala aslinya ke [0, 1].
-     * Melatih model neural network dengan embedding untuk pengguna dan anime.
-     * Menyimpan bobot embedding sebagai representasi fitur laten.
+**Kekurangan:**
+- Hanya merekomendasikan drama yang mirip kontennya—tidak menangkap preferensi kompleks pengguna.
+- Tidak bisa menyarankan drama dari genre yang belum pernah ditonton pengguna.
 
-   * Arsitektur Model:
-     * Embedding pengguna dan anime.
-     * Penjumlahan bias.
-     * Dense Layer + Dropout.
-     * Output layer dengan aktivasi sigmoid.
+**Cosine Similarity Formula:**
+$$\text{cosine similarity} = \frac{\vec{A} \cdot \vec{B}}{\|\vec{A}\| \cdot \|\vec{B}\|}$$
 
-   * Kelebihan:
-     * Mampu mempelajari pola kompleks dari perilaku pengguna.
-     * Cocok untuk menangkap preferensi pengguna secara personal.
-     * Dapat merekomendasikan anime dari genre yang belum pernah ditonton sebelumnya (serendipity).
-  
-   * Kekurangan:
-     * Tidak bekerja dengan baik jika data rating sangat sedikit (cold start untuk user).
-     * Membutuhkan proses training yang lebih kompleks dan waktu komputasi lebih lama.
-       Rekomendasi Anime untuk User ID: 6113 (Collaborative Filtering)
+**Contoh Penerapan:**
+```python
+recommend('Crash Landing on You', 3)
+```
 
-   * Cara Kerja RecommenderNet
-      * Input Data
-        Data masukan terdiri dari pasangan (user, anime) yang sudah di-encode sebagai indeks numerik. Targetnya adalah rating yang telah dinormalisasi ke rentang 0–1.
-      * Embedding Layer
-        Model memiliki dua embedding layer: satu untuk pengguna dan satu untuk anime. Masing-masing mengubah ID menjadi vektor berdimensi 50 yang merepresentasikan karakteristik laten (latent features).
-      * Bias Embedding
-        Disertakan pula bias embedding untuk pengguna dan anime untuk menangkap kecenderungan rating spesifik dari masing-masing entitas. 
-      * Kombinasi Vektor (Dot Product)
-        Vektor user dan anime dikalikan elemen-per-elemen (element-wise product) dan dijumlahkan (dot product), lalu ditambahkan dengan bias masing-masing. 
-      * Layer Tambahan
-        Hasil dot product + bias kemudian masuk ke layer dense (ukuran 64, aktivasi ReLU), lalu dropout untuk mencegah overfitting, dan akhirnya layer output dengan aktivasi sigmoid (karena rating sudah dinormalisasi ke [0, 1]).
-      * Pelatihan Model
-        Model dilatih menggunakan loss function Mean Squared Error (MSE) dan optimizer Adam, dengan evaluasi menggunakan metrik Root Mean Squared Error (RMSE).
-      Penggunaan EarlyStopping dan ReduceLROnPlateau membantu menghentikan pelatihan dini saat performa stagnan dan menyesuaikan laju pembelajaran otomatis.
-      * Prediksi dan Rekomendasi
-        Setelah pelatihan, model dapat memprediksi tingkat kesukaan pengguna terhadap anime tertentu dan memberikan rekomendasi berdasarkan rating tertinggi.
+### 2. Collaborative Filtering
 
-    Anime dengan Rating Tinggi oleh Pengguna
-    *  **Macross: Do You Remember Love?**  
-       *Genre:* Action, Mecha, Military, Music, Romance, Sci-Fi, Space  
-    *  **Change!! Getter Robo: Sekai Saigo no Hi**  
-       *Genre:* Action, Adventure, Horror, Mecha, Psychological, Sci-Fi, Shounen  
-    *  **Gaiking: Legend of Daiku-Maryu**  
-       *Genre:* Action, Mecha, Sci-Fi  
-    *  **Kikou Senki Dragonar**  
-       *Genre:* Adventure, Mecha, Sci-Fi, Shounen, Space  
-    *  **Choujuushin Gravion**  
-       *Genre:* Action, Comedy, Mecha, Sci-Fi, Shounen  
-    ============================================================================
-    Rekomendasi Anime Teratas
-    *  **Kimi no Na wa.**  
-       *Genre:* Drama, Romance, School, Supernatural  
-    *  **Gintama°**  
-       *Genre:* Action, Comedy, Historical, Parody, Samurai, Sci-Fi, Shounen  
-    *  **Steins;Gate**  
-       *Genre:* Sci-Fi, Thriller  
-    *  **Ginga Eiyuu Densetsu**  
-       *Genre:* Drama, Military, Sci-Fi, Space  
-    *  **Gintama Movie: Kanketsu-hen - Yorozuya yo Eien Nare**  
-       *Genre:* Action, Comedy, Historical, Parody, Samurai, Sci-Fi, Shounen  
-    *  **Gintama': Enchousen**  
-       *Genre:* Action, Comedy, Historical, Parody, Samurai, Sci-Fi, Shounen  
-    *  **Clannad: After Story**  
-       *Genre:* Drama, Fantasy, Romance, Slice of Life, Supernatural  
-    *  **Koe no Katachi**  
-       *Genre:* Drama, School, Shounen  
-    *  **Gintama**  
-       *Genre:* Action, Comedy, Historical, Parody, Samurai, Sci-Fi, Shounen
-    *  **Code Geass: Hangyaku no Lelouch R2**  
-        *Genre:* Action, Drama, Mecha, Military, Sci-Fi, Super Power
+Collaborative Filtering mempelajari hubungan antara pengguna dan drama berdasarkan rating yang diberikan, tanpa melihat isi konten drama itu sendiri. Model ini dibangun menggunakan pendekatan **Matrix Factorization** berbasis neural network dengan TensorFlow/Keras.
+
+**Langkah-langkah:**
+- Melakukan encoding `user_id` dan `title` menjadi ID numerik (`user`, `title_id`).
+- Membagi data menjadi data latih dan uji (80:20).
+- Membangun model dengan embedding layer untuk pengguna dan drama.
+- Melatih model untuk mempelajari representasi laten dari pengguna dan drama.
+
+**Kelebihan:**
+- Dapat menangkap preferensi pengguna secara personal.
+- Tidak terbatas pada kemiripan konten—bisa memberikan rekomendasi yang lebih beragam.
+- Efektif dalam memahami pola perilaku pengguna dari data rating.
+
+**Kekurangan:**
+- Kurang efektif jika pengguna baru (cold start).
+- Memerlukan data interaksi yang cukup dan proses training lebih kompleks.
+
+#### Langkah-langkah:
+- Melakukan encoding `user_id` dan `title` menjadi ID numerik (`user`, `title_id`).
+- Membagi data menjadi data latih dan uji (80:20).
+- Membangun model dengan embedding layer untuk pengguna dan drama.
+- Melatih model untuk mempelajari representasi laten dari pengguna dan drama.
+
+#### Arsitektur Model:
+- Embedding Layer untuk pengguna dan drama (`Embedding(input_dim, output_dim)`).
+- Kombinasi vektor embedding menggunakan dot product.
+- Dense layer untuk pemrosesan lebih lanjut.
+- Output layer dengan aktivasi linear.
+  ```python
+  user_embedding = layers.Embedding(input_dim=n_users, output_dim=embedding_size)(user_input)
+  title_embedding = layers.Embedding(input_dim=n_titles, output_dim=embedding_size)(title_input)
+
+  dot_product = layers.Dot(axes=1)([layers.Flatten()(user_embedding), layers.Flatten()(title_embedding)])
+  output = layers.Dense(1)(dot_product)
+  ```
+
+   * Cara Kerja
+      * Input Data: Pasangan (user, title) diubah menjadi indeks numerik.
+      * Embedding Layer: Masing-masing ID diubah menjadi vektor berdimensi tetap (50).
+      * Dot Product: Embedding dari user dan title dikombinasikan menggunakan dot product.
+      * Output Layer: Dense layer dengan 1 neuron tanpa fungsi aktivasi, karena prediksi berada pada skala rating asli.
+        
+   * Pelatihan Model:
+Model dilatih menggunakan loss function Mean Squared Error (MSE) dan optimizer Adam. Evaluasi dilakukan dengan metrik Root Mean Squared Error (RMSE). Penggunaan EarlyStopping dan ReduceLROnPlateau membantu menghentikan pelatihan saat performa stagnan dan menyesuaikan learning rate.
+   * Contoh Training:
+     ```python
+     history = model.fit([X_train['user'], X_train['title_id']], y_train,validation_data=([X_test['user'], X_test['title_id']],
+     y_test),epochs=50, batch_size=32)
+     ```
+  * Contoh Rekomendasi:
+
+    Drama rated highly by user:
+    - Sing My Crush | Rating: 9.0
+    - Our Dating Sim | Rating: 9.0
+    - Roommates of Poongduck 304 | Rating: 9.0
+    - Semantic Error | Rating: 9.0
+    - Twenty-Five Twenty-One | Rating: 9.0
+    - Where Your Eyes Linger | Rating: 9.0
+    - Blueming | Rating: 8.5
+    - Unlock My Boss | Rating: 8.5
+    - Ghost Doctor | Rating: 8.5
+    - Big Mouth | Rating: 8.5
+    - Wish You: Your Melody From My Heart | Rating: 8.0
+    - The Golden Spoon | Rating: 8.0
+    - The School Nurse Files | Rating: 8.0
+    - Itaewon Class | Rating: 8.0
+    - Happiness | Rating: 8.0
+    - Bad and Crazy | Rating: 8.0
+    - Dali and the Cocky Prince | Rating: 8.0
+    - My Sweet Dear | Rating: 7.0
+    - The Director Who Buys Me Dinner | Rating: 7.0
+    - Happy Merry Ending | Rating: 6.5
+    - All of Us Are Dead | Rating: 6.5
+    - Grid | Rating: 6.5
+    - Lovers of the Red Sky | Rating: 6.5
+    - Duty After School: Part 2 | Rating: 4.0
+    
+    ==========================================================================
+    
+    Top 10 Drama Recommendations:
+    - The King of Pigs
+    - XX
+    - Missing: The Other Side
+    - She Makes My Heart Flutter
+    - The Eighth Sense
+    - We're Not Trash
+    - Ending Again
+    - The Veil
+    - Stranger Season 2
+    - Insider
    
 ## Evaluation
 
