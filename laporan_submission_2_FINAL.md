@@ -509,7 +509,7 @@ Hasil rekomendasi menunjukkan bahwa sistem berhasil memberikan drama yang secara
 
 ### Collaborative Filtering
 **Nilai RMSE Akhir:**  
-Model menghasilkan nilai RMSE pada data validasi sebesar **5.1851**, yang menunjukkan seberapa jauh prediksi rating berbeda dari rating asli.
+Model menghasilkan nilai RMSE pada data validasi sebesar **5.1068**, yang menunjukkan seberapa jauh prediksi rating berbeda dari rating asli.
 
 
 Dalam proyek ini digunakan **Root Mean Squared Error (RMSE)** sebagai metrik evaluasi utama. RMSE digunakan karena model berfokus pada prediksi nilai rating pengguna terhadap drama, yang merupakan data numerik kontinu.
