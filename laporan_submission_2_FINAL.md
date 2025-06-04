@@ -397,9 +397,9 @@ recommend("Crash Landing on You", 3)
 ```
 
 **Hasil:**
-1. Descendants of the Sun  
-2. The King: Eternal Monarch  
-3. Goblin
+1. curtain call  
+2. thirty but seventeen 
+3. flower of evil
 
 
 ### 2. Collaborative Filtering
@@ -455,45 +455,43 @@ Model dilatih menggunakan loss function Mean Squared Error (MSE) dan optimizer A
      ```
   * Contoh Rekomendasi:
 
-    Drama rated highly by user:
-    - Sing My Crush | Rating: 9.0
-    - Our Dating Sim | Rating: 9.0
-    - Roommates of Poongduck 304 | Rating: 9.0
-    - Semantic Error | Rating: 9.0
-    - Twenty-Five Twenty-One | Rating: 9.0
-    - Where Your Eyes Linger | Rating: 9.0
-    - Blueming | Rating: 8.5
-    - Unlock My Boss | Rating: 8.5
-    - Ghost Doctor | Rating: 8.5
-    - Big Mouth | Rating: 8.5
-    - Wish You: Your Melody From My Heart | Rating: 8.0
-    - The Golden Spoon | Rating: 8.0
-    - The School Nurse Files | Rating: 8.0
-    - Itaewon Class | Rating: 8.0
-    - Happiness | Rating: 8.0
-    - Bad and Crazy | Rating: 8.0
-    - Dali and the Cocky Prince | Rating: 8.0
-    - My Sweet Dear | Rating: 7.0
-    - The Director Who Buys Me Dinner | Rating: 7.0
-    - Happy Merry Ending | Rating: 6.5
-    - All of Us Are Dead | Rating: 6.5
-    - Grid | Rating: 6.5
-    - Lovers of the Red Sky | Rating: 6.5
-    - Duty After School: Part 2 | Rating: 4.0
-    
-    ==========================================================================
-    
-    Top 10 Drama Recommendations:
-    - The King of Pigs
-    - XX
-    - Missing: The Other Side
-    - She Makes My Heart Flutter
-    - The Eighth Sense
-    - We're Not Trash
-    - Ending Again
-    - The Veil
-    - Stranger Season 2
-    - Insider
+Drama rated highly by user:
+- Sing My Crush | Rating: 9.0
+- Our Dating Sim | Rating: 9.0
+- Roommates of Poongduck 304 | Rating: 9.0
+- Semantic Error | Rating: 9.0
+- Twenty-Five Twenty-One | Rating: 9.0
+- Where Your Eyes Linger | Rating: 9.0
+- Blueming | Rating: 8.5
+- Unlock My Boss | Rating: 8.5
+- Ghost Doctor | Rating: 8.5
+- Big Mouth | Rating: 8.5
+- Wish You: Your Melody From My Heart | Rating: 8.0
+- The Golden Spoon | Rating: 8.0
+- The School Nurse Files | Rating: 8.0
+- Itaewon Class | Rating: 8.0
+- Happiness | Rating: 8.0
+- Bad and Crazy | Rating: 8.0
+- Dali and the Cocky Prince | Rating: 8.0
+- My Sweet Dear | Rating: 7.0
+- The Director Who Buys Me Dinner | Rating: 7.0
+- Happy Merry Ending | Rating: 6.5
+- All of Us Are Dead | Rating: 6.5
+- Grid | Rating: 6.5
+- Lovers of the Red Sky | Rating: 6.5
+- Duty After School: Part 2 | Rating: 4.0
+
+Top 10 Drama Recommendations:
+- Yumi's Cells
+- The Eighth Sense
+- Our Beloved Summer
+- Hospital Playlist
+- Hometown Cha-Cha-Cha
+- Zombie Detective
+- Rookie Cops
+- Choco Milk Shake
+- Alchemy of Souls
+- Sweet Home
    
 ## Evaluation
 
