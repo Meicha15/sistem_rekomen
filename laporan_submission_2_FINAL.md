@@ -497,15 +497,28 @@ Model dilatih menggunakan loss function Mean Squared Error (MSE) dan optimizer A
    
 ## Evaluation
 
-### Content-Based Filtering
+#### Content-Based Filtering
 
-Evaluasi pada pendekatan Content-Based Filtering dilakukan secara kualitatif dengan cara menguji apakah sistem mampu merekomendasikan drama yang relevan terhadap input pengguna. Evaluasi ini dilakukan dengan mengeksekusi fungsi `recommend()` pada beberapa drama populer dan memeriksa hasilnya secara manual.
+Untuk mengevaluasi performa model **Content-Based Filtering**, digunakan metrik **Precision@K**. Precision@K mengukur seberapa banyak rekomendasi yang relevan di dalam K rekomendasi teratas yang dihasilkan oleh sistem.
 
-**Contoh Pengujian:**
-```python
-recommend("Crash Landing on You", 3)
-```
-Hasil rekomendasi menunjukkan bahwa sistem berhasil memberikan drama yang secara konten mirip dengan input, seperti genre romance, drama, dan latar militer atau supernatural. Ini menandakan bahwa TF-IDF Vectorizer yang digunakan mampu menangkap informasi penting dari fitur teks.
+- **Precision@3** untuk model ini dihitung sebagai berikut:
+  - Daftar rekomendasi top-3 untuk query "Crash Landing on You" adalah:
+    1. Curtain Call
+    2. Thirty But Seventeen
+    3. Flower of Evil
+  - Daftar item relevan yang diinginkan adalah:
+    1. Curtain Call
+    2. Thirty But Seventeen
+    3. Flower of Evil
+   
+#### Rumus Precision
+$$
+\text{Precision@K} = \frac{\text{Jumlah item relevan dalam K rekomendasi}}{\text{K}}
+$$
+
+**Hasil** Precision@3 = 1.0 (Artinya, semua 3 rekomendasi yang diberikan model adalah relevan).
+
+Evaluasi ini menunjukkan bahwa **Content-Based Filtering** berhasil memberikan rekomendasi yang sangat relevan berdasarkan kemiripan konten, yang mencakup faktor-faktor seperti genre, aktor, dan tema.
 
 ### Collaborative Filtering
 **Nilai RMSE Akhir:**  
