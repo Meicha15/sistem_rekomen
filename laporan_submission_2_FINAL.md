@@ -397,10 +397,12 @@ recommend("Crash Landing on You", 3)
 ```
 
 **Hasil:**
-1. curtain call  
-2. thirty but seventeen 
-3. flower of evil
 
+| No | Drama Name        | Rating | Actor Names                                                                 |
+|----|-------------------|--------|-----------------------------------------------------------------------------|
+| 1  | Curtain Call      | 10.0   | Go Doo Shim, Kang Ha Neul, Ha Ji Won, Kwon Sang Woo, Lee Jung Shin, etc.    |
+| 2  | Thirty But Seventeen | 10.0 | Shin Hye Sun, Ahn Hyo Seop, Ye Ji Won, Yoon Sun Woo, etc.                  |
+| 3  | Flower of Evil    | 8.5    | Seo Hyun Woo, Jang Hee Jin, Moon Chae Won, Lee Joong Moon, etc.             |
 
 ### 2. Collaborative Filtering
 
@@ -454,74 +456,88 @@ Model dilatih menggunakan loss function Mean Squared Error (MSE) dan optimizer A
      y_test),epochs=50, batch_size=32)
      ```
   * Contoh Rekomendasi:
-
-Drama rated highly by user:
-- Sing My Crush | Rating: 9.0
-- Our Dating Sim | Rating: 9.0
-- Roommates of Poongduck 304 | Rating: 9.0
-- Semantic Error | Rating: 9.0
-- Twenty-Five Twenty-One | Rating: 9.0
-- Where Your Eyes Linger | Rating: 9.0
-- Blueming | Rating: 8.5
-- Unlock My Boss | Rating: 8.5
-- Ghost Doctor | Rating: 8.5
-- Big Mouth | Rating: 8.5
-- Wish You: Your Melody From My Heart | Rating: 8.0
-- The Golden Spoon | Rating: 8.0
-- The School Nurse Files | Rating: 8.0
-- Itaewon Class | Rating: 8.0
-- Happiness | Rating: 8.0
-- Bad and Crazy | Rating: 8.0
-- Dali and the Cocky Prince | Rating: 8.0
-- My Sweet Dear | Rating: 7.0
-- The Director Who Buys Me Dinner | Rating: 7.0
-- Happy Merry Ending | Rating: 6.5
-- All of Us Are Dead | Rating: 6.5
-- Grid | Rating: 6.5
-- Lovers of the Red Sky | Rating: 6.5
-- Duty After School: Part 2 | Rating: 4.0
-
-Top 10 Drama Recommendations:
-- Yumi's Cells
-- The Eighth Sense
-- Our Beloved Summer
-- Hospital Playlist
-- Hometown Cha-Cha-Cha
-- Zombie Detective
-- Rookie Cops
-- Choco Milk Shake
-- Alchemy of Souls
-- Sweet Home
+    
+    Drama Rated Highly by User:
+   
+   | No | Drama Name                               | Rating |
+   |----|------------------------------------------|--------|
+   | 1  | Sing My Crush                           | 9.0    |
+   | 2  | Our Dating Sim                          | 9.0    |
+   | 3  | Roommates of Poongduck 304              | 9.0    |
+   | 4  | Semantic Error                          | 9.0    |
+   | 5  | Twenty-Five Twenty-One                  | 9.0    |
+   | 6  | Where Your Eyes Linger                  | 9.0    |
+   | 7  | Blueming                                 | 8.5    |
+   | 8  | Unlock My Boss                          | 8.5    |
+   | 9  | Ghost Doctor                            | 8.5    |
+   | 10 | Big Mouth                               | 8.5    |
+   | 11 | Wish You: Your Melody From My Heart     | 8.0    |
+   | 12 | The Golden Spoon                        | 8.0    |
+   | 13 | The School Nurse Files                  | 8.0    |
+   | 14 | Itaewon Class                           | 8.0    |
+   | 15 | Happiness                               | 8.0    |
+   | 16 | Bad and Crazy                           | 8.0    |
+   | 17 | Dali and the Cocky Prince               | 8.0    |
+   | 18 | My Sweet Dear                           | 7.0    |
+   | 19 | The Director Who Buys Me Dinner         | 7.0    |
+   | 20 | Happy Merry Ending                      | 6.5    |
+   | 21 | All of Us Are Dead                      | 6.5    |
+   | 22 | Grid                                    | 6.5    |
+   | 23 | Lovers of the Red Sky                   | 6.5    |
+   | 24 | Duty After School: Part 2               | 4.0    |
+   
+   Top 10 Drama Recommendations:
+  
+   1. Hospital Playlist Season 2
+   2. Never Twice
+   3. Mother
+   4. Sweet Home
+   5. Once Again
+   6. 18 Again
+   7. Tale of the Nine-Tailed
+   8. Hyde, Jekyll, Me
+   9. The Eighth Sense
+   10. Dr. Romantic Season 3
    
 ## Evaluation
 
 #### Content-Based Filtering
 
-Untuk mengevaluasi performa model **Content-Based Filtering**, digunakan metrik **Precision@K**. Precision@K mengukur seberapa banyak rekomendasi yang relevan di dalam K rekomendasi teratas yang dihasilkan oleh sistem.
+Sistem rekomendasi ini menggunakan pendekatan **Content-Based Filtering** yang merekomendasikan drama berdasarkan kemiripan deskripsi konten dengan drama yang disukai pengguna. Untuk mengevaluasi performa sistem, digunakan metrik **Precision@K**.
 
-- **Precision@3** untuk model ini dihitung sebagai berikut:
-  - Daftar rekomendasi top-3 untuk query "Crash Landing on You" adalah:
-    1. Curtain Call
-    2. Thirty But Seventeen
-    3. Flower of Evil
-  - Daftar item relevan yang diinginkan adalah:
-    1. Curtain Call
-    2. Thirty But Seventeen
-    3. Flower of Evil
-   
-#### Rumus Precision
+**Rumus Precision@K**
+
 $$
-\text{Precision@K} = \frac{\text{Jumlah item relevan dalam K rekomendasi}}{\text{K}}
+\text{Precision@K} = \frac{\text{Jumlah item relevan dalam K rekomendasi}}{K}
 $$
 
-**Hasil** Precision@3 = 1.0 (Artinya, semua 3 rekomendasi yang diberikan model adalah relevan).
+Precision@K mengukur proporsi item yang relevan dari total rekomendasi sebanyak `K`. Semakin tinggi nilainya (maksimum 1), semakin akurat rekomendasi yang diberikan oleh sistem.
 
+**Prosedur Evaluasi**
+
+1. Sistem memilih satu drama sebagai **query**, yang dianggap disukai pengguna.
+2. Menghasilkan **K rekomendasi teratas** berdasarkan kemiripan konten.
+3. Menentukan item relevan otomatis berdasarkan ambang batas `rating > 7`.
+4. Precision dihitung dengan membandingkan rekomendasi terhadap daftar item relevan.
+5. Untuk evaluasi lengkap, proses ini dapat diulang untuk banyak pengguna (misalnya 100) dan dihitung **Average Precision@K**.
+
+**Hasil Evaluasi (Contoh)** : Precision@3 = 1.0 (Artinya, semua 3 rekomendasi yang diberikan model adalah relevan).
+
+**Query**: `Crash Landing on You`  
+**K**: 3  
+**Fungsi**:
+```python
+recommended_items = recommend("Crash Landing on You", k=3)
+relevant_items = get_relevant_items_by_rating(drama_content)
+precision = precision_at_k(recommended_items, relevant_items, k=3)
+Precision@3 = 1.0 (Artinya, semua 3 rekomendasi yang diberikan model adalah relevan).
+```
 Evaluasi ini menunjukkan bahwa **Content-Based Filtering** berhasil memberikan rekomendasi yang sangat relevan berdasarkan kemiripan konten, yang mencakup faktor-faktor seperti genre, aktor, dan tema.
 
 ### Collaborative Filtering
+
 **Nilai RMSE Akhir:**  
 Model menghasilkan nilai RMSE pada data validasi sebesar **5.1068**, yang menunjukkan seberapa jauh prediksi rating berbeda dari rating asli.
-
 
 Dalam proyek ini digunakan **Root Mean Squared Error (RMSE)** sebagai metrik evaluasi utama. RMSE digunakan karena model berfokus pada prediksi nilai rating pengguna terhadap drama, yang merupakan data numerik kontinu.
 
