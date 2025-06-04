@@ -459,45 +459,44 @@ Model dilatih menggunakan loss function Mean Squared Error (MSE) dan optimizer A
     
     Drama Rated Highly by User:
    
-   | No | Drama Name                               | Rating |
-   |----|------------------------------------------|--------|
-   | 1  | Sing My Crush                           | 9.0    |
-   | 2  | Our Dating Sim                          | 9.0    |
-   | 3  | Roommates of Poongduck 304              | 9.0    |
-   | 4  | Semantic Error                          | 9.0    |
-   | 5  | Twenty-Five Twenty-One                  | 9.0    |
-   | 6  | Where Your Eyes Linger                  | 9.0    |
-   | 7  | Blueming                                 | 8.5    |
-   | 8  | Unlock My Boss                          | 8.5    |
-   | 9  | Ghost Doctor                            | 8.5    |
-   | 10 | Big Mouth                               | 8.5    |
-   | 11 | Wish You: Your Melody From My Heart     | 8.0    |
-   | 12 | The Golden Spoon                        | 8.0    |
-   | 13 | The School Nurse Files                  | 8.0    |
-   | 14 | Itaewon Class                           | 8.0    |
-   | 15 | Happiness                               | 8.0    |
-   | 16 | Bad and Crazy                           | 8.0    |
-   | 17 | Dali and the Cocky Prince               | 8.0    |
-   | 18 | My Sweet Dear                           | 7.0    |
-   | 19 | The Director Who Buys Me Dinner         | 7.0    |
-   | 20 | Happy Merry Ending                      | 6.5    |
-   | 21 | All of Us Are Dead                      | 6.5    |
-   | 22 | Grid                                    | 6.5    |
-   | 23 | Lovers of the Red Sky                   | 6.5    |
-   | 24 | Duty After School: Part 2               | 4.0    |
+   | Judul Drama | Rating |
+   |-------------|--------|
+   | Sing My Crush | 9.0 |
+   | Our Dating Sim | 9.0 |
+   | Roommates of Poongduck 304 | 9.0 |
+   | Semantic Error | 9.0 |
+   | Twenty-Five Twenty-One | 9.0 |
+   | Where Your Eyes Linger | 9.0 |
+   | Blueming | 8.5 |
+   | Unlock My Boss | 8.5 |
+   | Ghost Doctor | 8.5 |
+   | Big Mouth | 8.5 |
+   | Wish You: Your Melody From My Heart | 8.0 |
+   | The Golden Spoon | 8.0 |
+   | The School Nurse Files | 8.0 |
+   | Itaewon Class | 8.0 |
+   | Happiness | 8.0 |
+   | Bad and Crazy | 8.0 |
+   | Dali and the Cocky Prince | 8.0 |
+   | My Sweet Dear | 7.0 |
+   | The Director Who Buys Me Dinner | 7.0 |
+   | Happy Merry Ending | 6.5 |
+   | All of Us Are Dead | 6.5 |
+   | Grid | 6.5 |
+   | Lovers of the Red Sky | 6.5 |
+   | Duty After School: Part 2 | 4.0 |
    
    Top 10 Drama Recommendations:
-  
-   1. Hospital Playlist Season 2
-   2. Never Twice
-   3. Mother
-   4. Sweet Home
-   5. Once Again
-   6. 18 Again
-   7. Tale of the Nine-Tailed
-   8. Hyde, Jekyll, Me
-   9. The Eighth Sense
-   10. Dr. Romantic Season 3
+   - Youth of May
+   - Mad for Each Other
+   - D.P.
+   - Reflection of You
+   - Nobody Knows
+   - Move to Heaven
+   - The Boy Next Door
+   - Life on Mars
+   - Taxi Driver
+   - Kingdom Season 2
    
 ## Evaluation
 
@@ -537,7 +536,7 @@ Evaluasi ini menunjukkan bahwa **Content-Based Filtering** berhasil memberikan r
 ### Collaborative Filtering
 
 **Nilai RMSE Akhir:**  
-Model menghasilkan nilai RMSE pada data validasi sebesar **5.1068**, yang menunjukkan seberapa jauh prediksi rating berbeda dari rating asli.
+Model menghasilkan nilai RMSE pada data validasi sebesar **5.1201**, yang menunjukkan seberapa jauh prediksi rating berbeda dari rating asli.
 
 Dalam proyek ini digunakan **Root Mean Squared Error (RMSE)** sebagai metrik evaluasi utama. RMSE digunakan karena model berfokus pada prediksi nilai rating pengguna terhadap drama, yang merupakan data numerik kontinu.
 
@@ -582,7 +581,7 @@ plt.show()
 
 2. Apakah Setiap Goals Berhasil Dicapai?
    - Model Collaborative Filtering telah dibangun dan dilatih menggunakan histori rating pengguna, menunjukkan performa yang baik melalui evaluasi menggunakan Root Mean Squared Error (RMSE).
-   - Model Content-Based Filtering juga telah berhasil diimplementasikan dan dievaluasi secara kualitatif. Rekomendasi yang diberikan sesuai dengan konten yang diminati pengguna.
+   - Model Content-Based Filtering juga telah berhasil diimplementasikan dan dievaluasi secara kualitatif. Rekomendasi yang diberikan sesuai dengan konten yang diminati pengguna. Dan menggunakan precisio@k yang mendapatkan nilai 1 artinya relevan
    - Sistem ini mampu menyaring ratusan pilihan menjadi beberapa tontonan yang relevan, yang menjadi salah satu tujuan utama proyek.
 
 3. Apakah Solusi yang Direncanakan Memberikan Dampak?
